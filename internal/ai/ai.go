@@ -1,13 +1,10 @@
 package airequest
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"net/http"
+	"context"
 
 	"github.com/vivalabelousov2025/go-worker/internal/config"
-	"github.com/vivalabelousov2025/go-worker/internal/dto"
+	"google.golang.org/genai"
 )
 
 type AiService struct {
@@ -17,52 +14,25 @@ func New() *AiService {
 	return &AiService{}
 }
 
-func (a *AiService) AiRequest(prompt string, cfg *config.Config) (dto.AiResponse, error) {
-	apiKey := cfg.ApiKey
-
-	requestBody := dto.AiRequest{
-		Model: "deepseek-chat",
-		Messages: []struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		}{
-			{
-				Role:    "user",
-				Content: prompt,
-			},
-		},
-	}
-
-	jsonData, err := json.Marshal(requestBody)
+func (a *AiService) AiRequest(prompt string, cfg *config.Config) (string, error) {
+	ctx := context.Background()
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		APIKey:  cfg.ApiKey,
+		Backend: genai.BackendGeminiAPI,
+	})
 	if err != nil {
-		return dto.AiResponse{}, err
+		return "", err
 	}
 
-	req, err := http.NewRequest("POST", "https://api.deepseek.com/v1/chat/completions", bytes.NewBuffer(jsonData))
+	result, err := client.Models.GenerateContent(
+		ctx,
+		"gemini-2.0-flash",
+		genai.Text(prompt),
+		nil,
+	)
 	if err != nil {
-		return dto.AiResponse{}, err
+		return "", err
 	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return dto.AiResponse{}, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return dto.AiResponse{}, err
-	}
-
-	var r dto.AiResponse
-	err = json.Unmarshal(body, &r)
-	if err != nil {
-		return dto.AiResponse{}, err
-	}
-
-	return r, nil
+	res := result.Text()
+	return res, nil
 }
