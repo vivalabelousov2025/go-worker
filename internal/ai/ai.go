@@ -6,11 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/vivalabelousov2025/go-worker/internal/config"
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
 )
 
-func AiRequest(prompt string) (dto.AiResponse, error) {
-	apiKey := "sk-179cda0b06d741dfad6969c3282b25fe"
+func AiRequest(prompt string, cfg *config.Config) (dto.AiResponse, error) {
+	apiKey := cfg.ApiKey
 
 	requestBody := dto.AiRequest{
 		Model: "deepseek-chat",
