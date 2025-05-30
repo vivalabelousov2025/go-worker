@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
+	airequest "github.com/vivalabelousov2025/go-worker/internal/ai"
 	"github.com/vivalabelousov2025/go-worker/internal/config"
 	"github.com/vivalabelousov2025/go-worker/internal/rest"
-	"github.com/vivalabelousov2025/go-worker/internal/service"
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 )
 
@@ -18,7 +18,7 @@ func main() {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to parse config")
 	}
 
-	service := service.NewService()
+	service := airequest.New()
 
 	handl := rest.NewHandlers(service)
 

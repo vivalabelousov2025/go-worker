@@ -10,7 +10,14 @@ import (
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
 )
 
-func AiRequest(prompt string, cfg *config.Config) (dto.AiResponse, error) {
+type AiService struct {
+}
+
+func New() *AiService {
+	return &AiService{}
+}
+
+func (a *AiService) AiRequest(prompt string, cfg *config.Config) (dto.AiResponse, error) {
 	apiKey := cfg.ApiKey
 
 	requestBody := dto.AiRequest{

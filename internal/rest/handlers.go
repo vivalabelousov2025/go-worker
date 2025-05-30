@@ -4,19 +4,21 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/vivalabelousov2025/go-worker/internal/config"
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 	"go.uber.org/zap"
 )
 
-type Service interface {
+type AiService interface {
+	AiRequest(prompt string, cfg *config.Config) (dto.AiResponse, error)
 }
 
 type Handlers struct {
-	service Service
+	service AiService
 }
 
-func NewHandlers(service Service) *Handlers {
+func NewHandlers(service AiService) *Handlers {
 	return &Handlers{service: service}
 }
 
