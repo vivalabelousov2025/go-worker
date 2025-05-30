@@ -3,7 +3,7 @@ package airequest
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/vivalabelousov2025/go-worker/internal/config"
@@ -53,7 +53,7 @@ func (a *AiService) AiRequest(prompt string, cfg *config.Config) (dto.AiResponse
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return dto.AiResponse{}, err
 	}

@@ -1,7 +1,7 @@
 package dto
 
 type AiRequest struct {
-	Model    string `json: model`
+	Model    string `json:"model"`
 	Messages []struct {
 		Role    string `json:"role"`
 		Content string `json:"content"`
