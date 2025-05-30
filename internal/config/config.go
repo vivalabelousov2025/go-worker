@@ -3,7 +3,7 @@ package config
 import "github.com/ilyakaznacheev/cleanenv"
 
 type Config struct {
-	Port int `env:"PORT" env-default:"8080"`
+	Port int `env:"PORT" env-default:"8090"`
 }
 
 func New() (*Config, error) {
