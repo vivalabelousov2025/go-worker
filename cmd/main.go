@@ -5,6 +5,7 @@ import (
 
 	"github.com/vivalabelousov2025/go-worker/internal/config"
 	"github.com/vivalabelousov2025/go-worker/internal/rest"
+	"github.com/vivalabelousov2025/go-worker/internal/service"
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 )
 
@@ -17,7 +18,9 @@ func main() {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to parse config")
 	}
 
-	handl := rest.NewHandlers()
+	service := service.NewService()
+
+	handl := rest.NewHandlers(service)
 
 	router := rest.NewRouter(ctx, cfg, handl)
 
