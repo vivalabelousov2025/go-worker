@@ -32,8 +32,6 @@ type Order struct {
 	Status             OrderStatus `json:"status"`
 	TotalPrice         float64     `json:"total_price,omitempty"`
 
-	// Relations
-	User              User              `json:"user,omitempty"`
 	Team              Team              `json:"team,omitempty"`
 	OrderTechnologies []OrderTechnology `json:"order_technologies,omitempty"`
 }
@@ -43,19 +41,6 @@ type Team struct {
 	Name         string `json:"name"`
 	MembersCount int    `json:"members_count"`
 	Experience   int    `json:"experience"`
-
-	// Relations
-	Orders []Order `json:"orders,omitempty"`
-}
-
-type User struct {
-	UserID    string    `json:"user_id"`
-	Email     string    `json:"email"`
-	Password  string    `json:"-"` // Excluded from JSON serialization
-	FirstName string    `json:"first_name,omitempty"`
-	LastName  string    `json:"last_name,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
 
 	// Relations
 	Orders []Order `json:"orders,omitempty"`
