@@ -38,7 +38,7 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 	res, err := h.service.AiRequest(ctx, prompt)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "blabla")
+		return c.JSON(http.StatusInternalServerError, err)
 	}
 
 	return c.JSON(http.StatusOK, res)

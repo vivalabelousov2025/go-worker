@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/vivalabelousov2025/go-worker/internal/config"
+	"github.com/vivalabelousov2025/go-worker/pkg/logger"
+	"go.uber.org/zap"
 	"google.golang.org/genai"
 )
 
@@ -24,6 +26,7 @@ func (a *AiService) AiRequest(ctx context.Context, prompt string) (string, error
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed connect to gemeni", zap.Error(err))
 		return "", err
 	}
 
@@ -34,11 +37,11 @@ func (a *AiService) AiRequest(ctx context.Context, prompt string) (string, error
 		nil,
 	)
 
-	fmt.Println(result.Text(), err)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to generate response", zap.Error(err))
 		return "", err
 	}
 	res := result.Text()
-	fmt.Println(res)
+
 	return res, nil
 }

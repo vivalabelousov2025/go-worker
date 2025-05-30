@@ -5,7 +5,7 @@ import "github.com/ilyakaznacheev/cleanenv"
 type Config struct {
 	Port int `env:"PORT" env-default:"8030"`
 
-	ApiKey string `env:"APIKEY" env-default:"AIzaSyCRx6WlYdMfrOx8VYbYtrpfKPHYFZsgHbY"`
+	ApiKey string `env:"APIKEY" env-default:""`
 }
 
 func New() (*Config, error) {
