@@ -3,9 +3,9 @@ package config
 import "github.com/ilyakaznacheev/cleanenv"
 
 type Config struct {
-	Port int `env:"PORT" env-default:"8090"`
+	Port int `env:"PORT" env-default:"8030"`
 
-	ApiKey string `env:"APIKEY"`
+	ApiKey string `env:"APIKEY" env-default:"AIzaSyCRx6WlYdMfrOx8VYbYtrpfKPHYFZsgHbY"`
 }
 
 func New() (*Config, error) {

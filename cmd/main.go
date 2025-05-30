@@ -18,7 +18,7 @@ func main() {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to parse config")
 	}
 
-	service := airequest.New()
+	service := airequest.New(cfg)
 
 	handl := rest.NewHandlers(service)
 
