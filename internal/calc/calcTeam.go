@@ -13,15 +13,15 @@ func CalcTeam(ctx context.Context, teams []dto.Team) (*dto.Team, error) {
 		logger.GetLoggerFromCtx(ctx).Fatal(ctx, "Пустой массив")
 	}
 
-	var earliestTeam *dto.Team
+	var earliestTeam dto.Team
 	earliestCompletionTime := time.Time{}
 
 	for i, v := range teams {
 		if i == 0 || v.NextFreeDate.Before(earliestCompletionTime) {
 			earliestCompletionTime = v.NextFreeDate
-			earliestTeam = &teams[i]
+			earliestTeam = teams[i]
 		}
 	}
 
-	return earliestTeam, nil
+	return &earliestTeam, nil
 }
