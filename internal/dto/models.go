@@ -32,8 +32,7 @@ type Order struct {
 	Status             OrderStatus `json:"status"`
 	TotalPrice         float64     `json:"total_price,omitempty"`
 
-	Team              Team              `json:"team,omitempty"`
-	OrderTechnologies []OrderTechnology `json:"order_technologies,omitempty"`
+	Teams []Team `json:"team,omitempty"`
 }
 
 type Team struct {
@@ -43,5 +42,5 @@ type Team struct {
 	Experience   int    `json:"experience"`
 
 	// Relations
-	Orders []Order `json:"orders,omitempty"`
+	Orders int `json:"orders,omitempty"`
 }
