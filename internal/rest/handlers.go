@@ -38,21 +38,34 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 
 	prompt := createPrompt(&reqSturct)
 
-	res, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
-	if err != nil {
-		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to send req Gemeni", zap.Error(err))
-		return c.JSON(http.StatusInternalServerError, "filde to send request Gemeni")
+	for i := 1; i < 5; i++ {
+
+		res, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
+		if err != nil {
+			logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to send req Gemeni", zap.Error(err))
+			return c.JSON(http.StatusInternalServerError, "filde to send request Gemeni")
+		}
+
+		team, err := calc.CalcTeam(ctx, reqSturct.Teams, &resp)
+		if err != nil {
+			logger.GetLoggerFromCtx(ctx).Info(ctx, err.Error())
+			return c.JSON(http.StatusBadRequest, "filed to parse date and team")
+		}
+
+		tech, hard, err := parseLastTwoNumbers(res, &resp)
+
+		resp.Price, err = calc.CalcPrice(&reqSturct, team, hard)
+
+		resp.OrderID = reqSturct.OrderID
+		resp.Stack = tech
+
+		err = resp.Validate()
+
+		if err != nil {
+			continue
+		}
+		break
 	}
-
-	team, err := calc.CalcTeam(ctx, reqSturct.Teams, &resp)
-	if err != nil {
-		logger.GetLoggerFromCtx(ctx).Info(ctx, err.Error())
-		return c.JSON(http.StatusBadRequest, "filed to parse date and team")
-	}
-
-	_, hard, err := parseLastTwoNumbers(res, &resp)
-
-	resp.Price, err = calc.CalcPrice(&reqSturct, team, hard)
 
 	return c.JSON(http.StatusOK, resp)
 
@@ -114,5 +127,5 @@ func parseLastTwoNumbers(s string, resp *dto.Response) ([]string, float64, error
 		log.Print(err)
 	}
 
-	return arr[:2], hard, nil
+	return arr[:len(arr)-3], hard, nil
 }

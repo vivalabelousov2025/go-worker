@@ -1,6 +1,9 @@
 package dto
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type OrderStatus string
 
@@ -50,4 +53,36 @@ type Response struct {
 	DateEnd   string   `json:"estimated_end_date"`
 	Price     float64  `json:"total_price"`
 	Stack     []string `json:"order_technologies"`
+}
+
+func (r *Response) Validate() error {
+	if r == nil {
+		return fmt.Errorf("response is nil")
+	}
+
+	if r.OrderID == "" {
+		return fmt.Errorf("order_id is empty")
+	}
+
+	if r.TeamID == "" {
+		return fmt.Errorf("team_id is empty")
+	}
+
+	if r.DateStart == "" {
+		return fmt.Errorf("estimated_start_date is empty")
+	}
+
+	if r.DateEnd == "" {
+		return fmt.Errorf("estimated_end_date is empty")
+	}
+
+	if r.Price == 0 {
+		return fmt.Errorf("total_price is zero")
+	}
+
+	if r.Stack == nil || len(r.Stack) == 0 {
+		return fmt.Errorf("order_technologies is nil or empty")
+	}
+
+	return nil
 }
