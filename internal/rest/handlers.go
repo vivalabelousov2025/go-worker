@@ -5,17 +5,17 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	airequest "github.com/vivalabelousov2025/go-worker/internal/ai"
+	"github.com/vivalabelousov2025/go-worker/internal/ai"
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 	"go.uber.org/zap"
 )
 
 type Handlers struct {
-	service *airequest.AiService
+	service *ai.AiService
 }
 
-func NewHandlers(service *airequest.AiService) *Handlers {
+func NewHandlers(service *ai.AiService) *Handlers {
 	return &Handlers{service: service}
 }
 

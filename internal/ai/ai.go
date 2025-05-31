@@ -1,4 +1,4 @@
-package airequest
+package ai
 
 import (
 	"context"
@@ -21,17 +21,15 @@ func New(cfg *config.Config) *AiService {
 
 func (a *AiService) CallGeminiAPIWithToken(prompt string) (string, error) {
 
-	proxyURL, err := url.Parse(a.cfg.ProxyUrl) // Замените на свой прокси
+	proxyURL, err := url.Parse(a.cfg.ProxyUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Создаем HTTP-транспорт с прокси
 	transport := &http.Transport{
 		Proxy: http.ProxyURL(proxyURL),
 	}
 
-	// Создаем HTTP-клиент с этим транспортом
 	clientProxy := &http.Client{
 		Transport: transport,
 	}
