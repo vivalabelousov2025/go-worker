@@ -6,7 +6,7 @@ import (
 
 const basePrice float64 = 10000
 
-func CalcPrice(o dto.Order, t dto.Team) (float64, error) {
+func CalcPrice(o *dto.Order, t *dto.Team, hard float64) (float64, error) {
 	var price float64
 
 	ratioExpirience := 1 + (float64(t.Experience) / 10)
@@ -24,7 +24,7 @@ func CalcPrice(o dto.Order, t dto.Team) (float64, error) {
 		ratioUrgency = 1.5
 	}
 
-	price = basePrice * ratioExpirience * ratioMembers * ratioUrgency
+	price = basePrice * ratioExpirience * ratioMembers * ratioUrgency * hard
 
 	return price, nil
 }

@@ -44,12 +44,15 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, "filde to send request Gemeni")
 	}
 
-	if err := calc.CalcTeam(ctx, reqSturct.Teams, &resp); err != nil {
+	team, err := calc.CalcTeam(ctx, reqSturct.Teams, &resp)
+	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, err.Error())
 		return c.JSON(http.StatusBadRequest, "filed to parse date and team")
 	}
 
-	_, _, err = parseLastTwoNumbers(res, &resp)
+	_, hard, err := parseLastTwoNumbers(res, &resp)
+
+	resp.Price, err = calc.CalcPrice(&reqSturct, team, hard)
 
 	return c.JSON(http.StatusOK, resp)
 
@@ -61,6 +64,7 @@ func createPrompt(orders *dto.Order) string {
 						%s, оцени сложность выполнения
 
 						 задания на данном стэке и время выполнение задания в формате:
+						 Без текста в начале
 
 						 Технологии в одну строку через запятую без лишнего (не более 7)
 
@@ -83,33 +87,32 @@ func createPrompt(orders *dto.Order) string {
 	return prompt
 }
 
-func parseLastTwoNumbers(s string, resp *dto.Response) (int, []string, error) {
-	lines := strings.Split(s, "\n")
+func parseLastTwoNumbers(s string, resp *dto.Response) ([]string, float64, error) {
 
 	const dateFormat = "2006-01-02"
 
-	stack := strings.Split(lines[0], ",")
-	for i, word := range stack {
-		stack[i] = strings.TrimSpace(word) // Убираем лишние пробелы
-	}
+	str := strings.TrimSpace(s)
 
-	num1, err1 := strconv.Atoi(strings.TrimSpace(lines[1]))
-	num2, err2 := strconv.Atoi(strings.TrimSpace(lines[2]))
-	if err1 != nil || err2 != nil {
-		fmt.Println("Ошибка парсинга чисел")
-		return 0, nil, err1
-	}
+	str = strings.ReplaceAll(str, "\n", ",")
 
-	fmt.Println(num1, num2, stack)
+	arr := strings.Split(str, ",")
+	fmt.Println(arr)
 
 	endTime, err := time.Parse(dateFormat, resp.DateStart)
 
 	if err != nil {
 		log.Println(err)
-		return 0, nil, err
+		return nil, 0, err
 	}
 
-	resp.DateEnd = endTime.AddDate(0, 0, num1).Format(dateFormat)
-	// Возвращаем два последних числа
-	return num2, nil, nil
+	endDate, _ := strconv.Atoi(arr[len(arr)-1])
+
+	resp.DateEnd = endTime.AddDate(0, 0, endDate).Format(dateFormat)
+
+	hard, err := strconv.ParseFloat(arr[len(arr)-1], 32)
+	if err != nil {
+		log.Print(err)
+	}
+
+	return arr[:2], hard, nil
 }
