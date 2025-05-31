@@ -1,25 +1,21 @@
 package rest
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	airequest "github.com/vivalabelousov2025/go-worker/internal/ai"
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 	"go.uber.org/zap"
 )
 
-type AiService interface {
-	AiRequest(ctx context.Context, prompt string) (string, error)
-}
-
 type Handlers struct {
-	service AiService
+	service *airequest.AiService
 }
 
-func NewHandlers(service AiService) *Handlers {
+func NewHandlers(service *airequest.AiService) *Handlers {
 	return &Handlers{service: service}
 }
 
@@ -35,10 +31,10 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 
 	prompt := createPrompt(&reqSturct)
 
-	res, err := h.service.AiRequest(ctx, prompt)
+	res, err := h.service.AiRequest(prompt)
 
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, res)
@@ -46,13 +42,7 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 }
 
 func createPrompt(orders *dto.Order) string {
-	prompt := fmt.Sprintf("Составь стэк для разработки по ТЗ: 
-						%s, оцени сложность выполнения 
-						задания на данном стэке и время выполнение задания в формате:   
-						Технологии через запятую   
-						Число сложность от 1 до 2   
-						Время выполнения число в днях  
-						Выведи только нужную информацию и ничего больше",
+	prompt := fmt.Sprintf("собери стэк технлогий для разработки: %s и расчитай коэфицент сложности разработки на данном стэке. Ответ выведи только стэк через запятую и коэфицент в формате числа",
 		orders.Description,
 	)
 
