@@ -31,7 +31,7 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 
 	prompt := createPrompt(&reqSturct)
 
-	res, err := h.service.CallGeminiAPIWithToken(prompt)
+	res, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())

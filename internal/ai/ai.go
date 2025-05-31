@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"github.com/vivalabelousov2025/go-worker/internal/config"
+	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 	"google.golang.org/genai"
 )
 
@@ -19,11 +20,11 @@ func New(cfg *config.Config) *AiService {
 	return &AiService{cfg: cfg}
 }
 
-func (a *AiService) CallGeminiAPIWithToken(prompt string) (string, error) {
+func (a *AiService) CallGeminiAPIWithToken(ctx context.Context, prompt string) (string, error) {
 
 	proxyURL, err := url.Parse(a.cfg.ProxyUrl)
 	if err != nil {
-		log.Fatal(err)
+		logger.GetLoggerFromCtx(ctx).Info(ctx, err.Error())
 	}
 
 	transport := &http.Transport{
@@ -34,7 +35,6 @@ func (a *AiService) CallGeminiAPIWithToken(prompt string) (string, error) {
 		Transport: transport,
 	}
 
-	ctx := context.Background()
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
 		HTTPClient: clientProxy,
 		APIKey:     a.cfg.ApiKey,
