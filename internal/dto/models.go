@@ -42,3 +42,7 @@ type Team struct {
 	Experience    int    `json:"experience"`
 	MembersCount  int    `json:"members_count"`
 }
+
+type Response struct {
+	TeamID string `json:"team_id"`
+}

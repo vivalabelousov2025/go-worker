@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/vivalabelousov2025/go-worker/internal/ai"
+	"github.com/vivalabelousov2025/go-worker/internal/calc"
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 	"go.uber.org/zap"
@@ -31,13 +32,18 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 
 	prompt := createPrompt(&reqSturct)
 
-	res, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
+	_, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
+
+	team, err := calc.CalcTeam(ctx, reqSturct.Teams)
+	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, err.Error())
+	}
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, string(res))
+	return c.JSON(http.StatusOK, team)
 
 }
 
