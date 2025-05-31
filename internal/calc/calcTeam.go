@@ -8,7 +8,7 @@ import (
 	"github.com/vivalabelousov2025/go-worker/pkg/logger"
 )
 
-func CalcTeam(ctx context.Context, teams []dto.Team) (*dto.Team, error) {
+func CalcTeam(ctx context.Context, teams []dto.Team, resp *dto.Response) error {
 	if len(teams) == 0 {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, "Пустой массив")
 	}
@@ -23,7 +23,7 @@ func CalcTeam(ctx context.Context, teams []dto.Team) (*dto.Team, error) {
 
 		parsedTime, err := time.Parse(dateFormat, team.NextFreeDate)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		if parsedTime.Before(earliestCompletionTime) {
@@ -32,5 +32,8 @@ func CalcTeam(ctx context.Context, teams []dto.Team) (*dto.Team, error) {
 		}
 	}
 
-	return &earliestTeam, nil
+	resp.DateStart = earliestTeam.NextFreeDate
+	resp.TeamID = earliestTeam.TeamID
+
+	return nil
 }

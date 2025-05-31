@@ -44,5 +44,10 @@ type Team struct {
 }
 
 type Response struct {
-	TeamID string `json:"team_id"`
+	OrderID   string   `json:"order_id"`
+	TeamID    string   `json:"team_id"`
+	DateStart string   `json:"estimated_start_date"`
+	DateEnd   string   `json:"estimated_end_date"`
+	Price     float64  `json:"total_price"`
+	Stack     []string `json:"order_technologies"`
 }

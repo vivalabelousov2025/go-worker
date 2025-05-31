@@ -2,7 +2,11 @@ package rest
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/vivalabelousov2025/go-worker/internal/ai"
@@ -30,20 +34,22 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 		return err
 	}
 
+	var resp dto.Response
+
 	prompt := createPrompt(&reqSturct)
 
-	_, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
-
-	team, err := calc.CalcTeam(ctx, reqSturct.Teams)
+	res, err := h.service.CallGeminiAPIWithToken(ctx, prompt)
 	if err != nil {
+		logger.GetLoggerFromCtx(ctx).Info(ctx, "filed to send req Gemeni", zap.Error(err))
+		return c.JSON(http.StatusInternalServerError, "filde to send request Gemeni")
+	}
+
+	if err := calc.CalcTeam(ctx, reqSturct.Teams, &resp); err != nil {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, err.Error())
+		return c.JSON(http.StatusBadRequest, "filed to parse date and team")
 	}
 
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.JSON(http.StatusOK, team)
+	return c.JSON(http.StatusOK, res)
 
 }
 
@@ -59,4 +65,44 @@ func createPrompt(orders *dto.Order) string {
 	)
 
 	return prompt
+}
+
+func parseLastTwoNumbers(s string, resp *dto.Response) (int, error) {
+	lines := strings.Split(s, "\n")
+
+	const dateFormat = "2006-01-02"
+
+	var numbers []int
+
+	for _, line := range lines {
+		// Убираем пробелы по краям, если есть
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine == "" {
+			continue // Пропускаем пустые строки
+		}
+
+		// Пытаемся конвертировать строку в число
+		num, err := strconv.Atoi(trimmedLine)
+		if err == nil {
+			// Если успешно, добавляем в наш список чисел
+			numbers = append(numbers, num)
+		}
+		// Если ошибка (не число), просто игнорируем эту строку
+	}
+
+	// Проверяем, достаточно ли чисел мы нашли
+	if len(numbers) < 2 {
+		return 0, fmt.Errorf("не удалось найти два числа, найдено: %d", len(numbers))
+	}
+
+	endTime, err := time.Parse(dateFormat, resp.DateStart)
+
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	resp.DateEnd = endTime.AddDate(0, 0, numbers[len(numbers)-1]).GoString()
+	// Возвращаем два последних числа
+	return numbers[len(numbers)-2], nil
 }
