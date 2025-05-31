@@ -36,9 +36,9 @@ type Order struct {
 }
 
 type Team struct {
-	TeamID        string    `json:"team_id"`
-	CurrentOrders int       `json:"current_orders"`
-	NextFreeDate  time.Time `json:"next_free_date"`
-	Experience    int       `json:"experience"`
-	MembersCount  int       `json:"members_count"`
+	TeamID        string `json:"team_id"`
+	CurrentOrders int    `json:"current_orders"`
+	NextFreeDate  string `json:"next_free_date"`
+	Experience    int    `json:"experience"`
+	MembersCount  int    `json:"members_count"`
 }
