@@ -15,11 +15,11 @@ func CalcTeam(ctx context.Context, teams []dto.Team) (*dto.Team, error) {
 
 	const dateFormat = "2006-01-02"
 
-	var earliestTeam *dto.Team
+	var earliestTeam dto.Team
 	earliestCompletionTime := time.Date(9999, time.December, 31, 0, 0, 0, 0, time.UTC)
 
 	for i := range teams {
-		team := &teams[i]
+		team := teams[i]
 
 		parsedTime, err := time.Parse(dateFormat, team.NextFreeDate)
 		if err != nil {
@@ -32,5 +32,5 @@ func CalcTeam(ctx context.Context, teams []dto.Team) (*dto.Team, error) {
 		}
 	}
 
-	return earliestTeam, nil
+	return &earliestTeam, nil
 }
