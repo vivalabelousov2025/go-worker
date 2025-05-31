@@ -31,24 +31,24 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 
 	prompt := createPrompt(&reqSturct)
 
-	res, err := h.service.AiRequest(prompt)
+	res, err := h.service.CallGeminiAPIWithToken(prompt)
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, string(res))
 
 }
 
 func createPrompt(orders *dto.Order) string {
-	prompt := fmt.Sprintf("Составь стэк для разработки по ТЗ: Add commentMore actions
+	prompt := fmt.Sprintf(`Составь стэк для разработки по ТЗ: Add commentMore actions
 						%s, оцени сложность выполнения 
 						задания на данном стэке и время выполнение задания в формате:   
 						Технологии через запятую   
 						Число сложность от 1 до 2   
 						Время выполнения число в днях  
-						Выведи только нужную информацию и ничего больше",
+						Выведи только нужную информацию и ничего больше`,
 		orders.Description,
 	)
 

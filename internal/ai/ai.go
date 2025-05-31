@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"net/url"
 
 	"github.com/vivalabelousov2025/go-worker/internal/config"
 	"google.golang.org/genai"
@@ -17,13 +19,28 @@ func New(cfg *config.Config) *AiService {
 	return &AiService{cfg: cfg}
 }
 
-func (a *AiService) AiRequest(prompt string) (string, error) {
-	fmt.Println("ai request")
+func (a *AiService) CallGeminiAPIWithToken(prompt string) (string, error) {
+
+	proxyURL, err := url.Parse(a.cfg.ProxyUrl) // Замените на свой прокси
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Создаем HTTP-транспорт с прокси
+	transport := &http.Transport{
+		Proxy: http.ProxyURL(proxyURL),
+	}
+
+	// Создаем HTTP-клиент с этим транспортом
+	clientProxy := &http.Client{
+		Transport: transport,
+	}
+
 	ctx := context.Background()
-	fmt.Println(a.cfg.ApiKey)
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-		APIKey:  a.cfg.ApiKey,
-		Backend: genai.BackendGeminiAPI,
+		HTTPClient: clientProxy,
+		APIKey:     a.cfg.ApiKey,
+		Backend:    genai.BackendGeminiAPI,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -39,5 +56,7 @@ func (a *AiService) AiRequest(prompt string) (string, error) {
 		log.Fatal(err)
 	}
 	fmt.Println(result.Text())
+
 	return result.Text(), nil
+
 }

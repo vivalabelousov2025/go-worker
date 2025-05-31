@@ -6,6 +6,8 @@ type Config struct {
 	Port int `env:"PORT" env-default:"8030"`
 
 	ApiKey string `env:"APIKEY" env-default:""`
+
+	ProxyUrl string `env:"PROXY_URL" env-default:""`
 }
 
 func New() (*Config, error) {
