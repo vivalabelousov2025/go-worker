@@ -20,7 +20,7 @@ func main() {
 
 	service := ai.New(cfg)
 
-	handl := rest.NewHandlers(service)
+	handl := rest.NewHandlers(service, cfg)
 
 	router := rest.NewRouter(ctx, cfg, handl)
 

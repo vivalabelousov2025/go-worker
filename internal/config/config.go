@@ -7,7 +7,8 @@ type Config struct {
 
 	ApiKey string `env:"APIKEY" env-default:"AIzaSyCRx6WlYdMfrOx8VYbYtrpfKPHYFZsgHbY"`
 
-	ProxyUrl string `env:"PROXY_URL" env-default:"http://WCBDDLZI:HZ50YX0E@185.213.249.50:45596"`
+	ProxyUrl   string `env:"PROXY_URL" env-default:"http://WCBDDLZI:HZ50YX0E@185.213.249.50:45596"`
+	BackendUrl string `env:"BACKEND_URL" env-default:"http://localhost:8000"`
 }
 
 func New() (*Config, error) {

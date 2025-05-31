@@ -27,7 +27,7 @@ func NewRouter(ctx context.Context, cfg *config.Config, handlers *Handlers) *Rou
 		return ctx
 	}
 
-	e.POST("/order-process", handlers.OrderProcess)
+	e.POST("order-process", handlers.OrderProcess)
 
 	return &Router{router: e, cfg: cfg, handlers: handlers}
 

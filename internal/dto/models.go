@@ -15,11 +15,8 @@ const (
 )
 
 type OrderTechnology struct {
-	OrderID string `json:"order_id"`
-	Title   string `json:"title"`
-
-	// Relations
-	Orders []Order `json:"orders,omitempty"`
+	TechnologyID string `json:"technology_id"`
+	Title        string `json:"title"`
 }
 
 type Order struct {

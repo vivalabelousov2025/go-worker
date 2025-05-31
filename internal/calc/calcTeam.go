@@ -2,6 +2,7 @@ package calc
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/vivalabelousov2025/go-worker/internal/dto"
@@ -20,7 +21,7 @@ func CalcTeam(ctx context.Context, teams []dto.Team, resp *dto.Response) (*dto.T
 
 	for i := range teams {
 		team := teams[i]
-
+		fmt.Println(team.NextFreeDate, "team next free date")
 		parsedTime, err := time.Parse(dateFormat, team.NextFreeDate)
 		if err != nil {
 			return nil, err
