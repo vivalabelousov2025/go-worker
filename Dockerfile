@@ -25,7 +25,7 @@ COPY  --from=builder /go_worker .
 
 
 
-EXPOSE 8090
+EXPOSE 8010
 
 
 

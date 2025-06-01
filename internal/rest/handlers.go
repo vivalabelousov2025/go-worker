@@ -130,6 +130,19 @@ func createPrompt(orders *dto.Order, technologies *[]dto.OrderTechnology) string
 	return prompt
 }
 
+func removeDuplicates(slice []string) []string {
+	seen := make(map[string]bool)
+	result := []string{}
+
+	for _, item := range slice {
+		if !seen[item] {
+			seen[item] = true
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
 func parseLastTwoNumbers(s string, resp *dto.Response) ([]string, float64, error) {
 	str := strings.TrimSpace(s)
 	str = strings.ReplaceAll(str, "\n", ",")
@@ -150,7 +163,9 @@ func parseLastTwoNumbers(s string, resp *dto.Response) ([]string, float64, error
 		log.Print(err)
 	}
 
-	return arr[:len(arr)-3], hard, nil
+	// Удаляем дубликаты из массива технологий
+	technologies := removeDuplicates(arr[:len(arr)-3])
+	return technologies, hard, nil
 }
 
 func (h *Handlers) GetTechnologies() ([]dto.OrderTechnology, error) {
