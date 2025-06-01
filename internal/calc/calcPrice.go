@@ -6,13 +6,13 @@ import (
 
 const basePrice float64 = 10000
 
-func CalcPrice(o *dto.Order, t *dto.Team, hard float64) (float64, error) {
+func CalcPrice(order *dto.Order, team *dto.Team, hard float64) (float64, error) {
 	var price float64
 
-	ratioExpirience := 1 + (float64(t.Experience) / 10)
-	ratioMembers := 1 - (float64(t.MembersCount) / 10)
+	ratioExpirience := 1 + (float64(team.Experience) / 10)
+	ratioMembers := 1 - (float64(team.MembersCount) / 10)
 
-	diff := o.EstimatedEndDate.Sub(o.EstimatedStartDate)
+	diff := order.EstimatedEndDate.Sub(order.EstimatedStartDate)
 	days := int(diff.Hours() / 24)
 
 	var ratioUrgency float64

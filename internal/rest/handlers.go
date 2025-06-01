@@ -20,6 +20,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const dateFormat = "2006-01-02"
+
 type Handlers struct {
 	service *ai.AiService
 	cfg     *config.Config
@@ -99,6 +101,7 @@ func (h *Handlers) OrderProcess(c echo.Context) error {
 	err = h.UpdateOrder(c, &reqSturct, &resp)
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Info(ctx, "ошибка при обновлении заказа", zap.Error(err))
+		h.RejectOrder(c, reqSturct.OrderID)
 		return c.JSON(http.StatusInternalServerError, "ошибка при обновлении заказа")
 	}
 	return c.JSON(http.StatusOK, resp)
@@ -128,25 +131,18 @@ func createPrompt(orders *dto.Order, technologies *[]dto.OrderTechnology) string
 }
 
 func parseLastTwoNumbers(s string, resp *dto.Response) ([]string, float64, error) {
-
-	const dateFormat = "2006-01-02"
-
 	str := strings.TrimSpace(s)
-
 	str = strings.ReplaceAll(str, "\n", ",")
-
 	arr := strings.Split(str, ",")
 	fmt.Println(resp.DateStart, "resp date start")
 
 	endTime, err := time.Parse(dateFormat, resp.DateStart)
-
 	if err != nil {
 		log.Println(err)
 		return nil, 0, err
 	}
 
 	endDate, _ := strconv.Atoi(arr[len(arr)-1])
-
 	resp.DateEnd = endTime.AddDate(0, 0, endDate).Format(dateFormat)
 
 	hard, err := strconv.ParseFloat(arr[len(arr)-1], 32)
@@ -204,6 +200,19 @@ func (h *Handlers) UpdateOrder(c echo.Context, order *dto.Order, resp *dto.Respo
 	order.TeamID = resp.TeamID
 	order.TotalPrice = resp.Price
 
+	// Парсим даты с обработкой ошибок
+	startDate, err := time.Parse(dateFormat, resp.DateStart)
+	if err != nil {
+		return fmt.Errorf("ошибка при парсинге даты начала: %v", err)
+	}
+	order.EstimatedStartDate = startDate
+
+	endDate, err := time.Parse(dateFormat, resp.DateEnd)
+	if err != nil {
+		return fmt.Errorf("ошибка при парсинге даты окончания: %v", err)
+	}
+	order.EstimatedEndDate = endDate
+
 	// Фильтруем пустые строки из Stack
 	var filteredStack []string
 	for _, tech := range resp.Stack {
@@ -245,5 +254,23 @@ func (h *Handlers) UpdateOrder(c echo.Context, order *dto.Order, resp *dto.Respo
 	}
 	fmt.Printf("Тело ответа: %s\n", string(body))
 
+	return nil
+}
+
+func (h *Handlers) RejectOrder(c echo.Context, orderId string) error {
+	url := fmt.Sprintf("%s/worker/order-reject", h.cfg.BackendUrl)
+
+	jsonData, err := json.Marshal(orderId)
+	if err != nil {
+		return fmt.Errorf("ошибка при сериализации: %v", err)
+	}
+
+	httpResp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("ошибка при отправке запроса: %v", err)
+	}
+	defer httpResp.Body.Close()
+
+	fmt.Printf("Получен ответ со статусом: %d\n", httpResp.StatusCode)
 	return nil
 }
